@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# This script will install Roady and create
+# and push a new development branch.
+#
+# Usage
+#
+# installRoady
+#
+
+msg() {
+  printf '%b%s%b' "\n\n\e[0m\e[105m\e[30m" "$1" "\e[0m\n\n"
+}
+
+importantMsg() {
+  printf '%b%s%b' "\n\n\e[0m\e[103m\e[30m" "$1" "\e[0m\n\n"
+}
+
+msgAndExit() {
+  importantMsg "$1"
+  exit 1
+}
+
+timestamp=$(/usr/bin/date +"%s")
+pathToPhpProjects="$HOME/Git"
+pathToRoady="$pathToPhpProjects/Roady"
+# No longer works because git no longer allows creds to be passed via url:
+pass=$(/usr/bin/pass github.darling-dev.key)
+newBranchName="Roady$timestamp"
+pathToPhpUnit="${pathToRoady}/vendor/bin/phpunit"
+pathToPhpStan="${pathToRoady}/vendor/bin/phpstan"
+pathToComposer="/home/sevidarling/.local/bin/composer"
+
+[ -d "${pathToRoady}" ] && msgAndExit 'Roady is already installed.'
+
+[ ! -d "${pathToPhpProjects}" ] && mkdir -p "${pathToPhpProjects}"
+
+cd "${pathToPhpProjects}" ||
+  msgAndExit "Failed to move into ${pathToPhpProjects}"
+
+# No longer works because git no longer allows creds to be passed via url:
+git clone "https://sevidmusic:$pass@github.com/sevidmusic/Roady.git"
+# git clone "https://sevidmusic@github.com/sevidmusic/Roady.git"
+
+cd "${pathToRoady}" ||
+  msgAndExit "Failed to move into ${pathToRoady}"
+
+"${pathToComposer}" update ||
+  msgAndExit 'Failed to run composer update'
+
+"${pathToPhpUnit}" -c "${pathToRoady}/php.xml"
+
+"${pathToPhpStan}" analyze --level 9 \
+  "${pathToRoady}/src" \
+  "${pathToRoady}/tests"
+
+git checkout -b "${newBranchName}"
+
+# pushing no longer works because Git no longer accepts credntials via url.
+# Until a workaround is found, leave this commented out.
+git push -u origin "$newBranchName"
+
+msg "Installed Roady at ${pathToRoady}"
+
+msg "Ran phpunit tests"
+
+msg "Ran phpstan tests"
