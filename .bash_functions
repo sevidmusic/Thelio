@@ -153,3 +153,22 @@ git_status() {
 git_signed_commit() {
   git commit -S && echo -e "\033[1;32m (signed commit 😎) \033[0m"
 }
+
+# Pandoc
+
+convert_md_to_html() {
+  if [ -f /usr/bin/pandoc ]; then
+    if [ -z "${1}" ] || [ -z "${2}" ]; then
+      echo -e "\033[1;37m Please specify the \033[1;35mmarkdown\033[0m\033[1;37m file to convert, and the \033[1;35mname\033[0m\033[1;37m to use for the resulting \033[1;35mhtml file\033[0m\033[1;37m: \033[0m"
+      echo
+      echo -e "\033[1;33m convert_md_to_html <name-md-file-to-convert> <name-of-html-file-to-create> \033[0m"
+      echo
+      echo -e "For example:"
+      echo
+      echo -e "\033[1;33m convert_md_to_html README.md about.html \033[0m"
+      return 1
+    fi
+    #pandoc -f markdown -t html5 -o "${2}" "${1}" -c style.css
+    echo -e "\033[1;32m Converted ${1} to ${2} \033[0m"
+  fi
+}
