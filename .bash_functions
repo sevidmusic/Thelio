@@ -149,3 +149,7 @@ git_status() {
     echo -e "\033[1;37m (not a git repo) \033[0m"
   fi
 }
+
+git_signed_commit() {
+  git commit -S && echo -e "\033[1;32m (signed commit 😎) \033[0m"
+}
