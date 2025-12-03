@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Install a NerdFont via specified link obtained at https://www.nerdfonts.com/font-downloads
+#
+# Usage:
+#
+# ```
+#
+# installNerdFont <link-to-nerd-font>
+#
+# installNerdFont https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/UbuntuMono.zip
+#
+# ```
+#
+
+nerdFont="${1}"
+
+echo "Installing Nerd Font ${nerdFont}"
+
+wget -P ~/.local/share/fonts "${nerdFont}" \  &&
+  cd ~/.local/share/fonts &&
+  unzip UbuntuMono.zip &&
+  rm UbuntuMono.zip &&
+  fc-cache -fv

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Set default editor to nvim
+export EDITOR=nvim
+
+# Enable use of vim keybindings in command prompt.
+set -o vi
+

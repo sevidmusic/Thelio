@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "${HOME}/.local/bin" ]; then
+  PATH="${HOME}/.local/bin:${PATH}"
+  status="Added .local/bin to PATH successfully via .darling_profile"
+  echo -e "\033[1;92m (${status}) \033[0m"
+fi
+
+# set PATH so it includes .darling bin if it exists
+if [ -d "${HOME}/.darling/bin" ]; then
+  PATH="${HOME}/.darling/bin:${PATH}"
+  status="Added .darling/bin to PATH successfully via .darling_profile"
+  echo -e "\033[1;92m (${status}) \033[0m"
+fi
+
+if [ -f "${HOME}/.cargo/env" ]; then
+  # Load cargo env
+  status="Loaded .cargo/env successfully via .darling_profile"
+  echo -e "\033[1;92m (${status}) \033[0m"
+  . "${HOME}/.cargo/env"
+fi
+
+status="(Loaded .darling_profile successfully)"
+echo -e "\033[1;92m ${status} \033[0m"
+# sleep 1
+
+#history -c
+
+#clear

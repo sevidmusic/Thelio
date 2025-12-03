@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -73,7 +75,8 @@ esac
 
 # enable color support of ls, dir, vdir, grep, fgrep, and egrep.
 if [ -x /usr/bin/dircolors ]; then
-  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  # dircolors is not necessary. @see https://askubuntu.com/questions/389021/explain-eval-dircolors-path-to-dircolorsdb
+  # test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
   alias dir='dir --color=auto'
   alias vdir='vdir --color=auto'
   alias grep='grep --color=auto'
@@ -93,20 +96,34 @@ alias l='/usr/bin/ls -CF --color=auto'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
+# --- Darling Settings --- #
+
+# Load darling_profile
+if [ -f "${HOME}/.darling_profile" ]; then
+  . "${HOME}/.darling_profile"
+fi
+
 # Load bash_options
-if [ -f ~/.bash_options ]; then
-  . ~/.bash_options
+if [ -f "${HOME}/.bash_options" ]; then
+  . "${HOME}/.bash_options"
 fi
 
 # Load bash_functions
-if [ -f ~/.bash_functions ]; then
-  . ~/.bash_functions
+if [ -f "${HOME}/.bash_functions" ]; then
+  . "${HOME}/.bash_functions"
 fi
 
 # Load bash_aliases_
-if [ -f ~/.bash_aliases ]; then
-  . ~/.bash_aliases
+if [ -f "${HOME}/.bash_aliases" ]; then
+  . "${HOME}/.bash_aliases"
 fi
+
+# Load bash_ps1_
+if [ -f "${HOME}/.bash_ps1" ]; then
+  . "${HOME}/.bash_ps1"
+fi
+
+# --- End Darling Settings --- #
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -119,5 +136,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# execute cargo env
-. "$HOME/.cargo/env"
+status="(Loaded .bashrc successfully)"
+echo -e "\033[1;92m ${status} \033[0m"
+
+if [ -f "${HOME}/.darling_login" ]; then
+  # Load cargo env
+  status="Loaded .darling_login successfully via .darling_profile"
+  echo -e "\033[1;92m (${status}) \033[0m"
+  . "${HOME}/.darling_login"
+fi

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Update wal unless logging into new or existing tmux session
+[[ -z $TMUX ]] && updateWal
