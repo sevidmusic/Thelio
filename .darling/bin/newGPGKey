@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Generate a GPG key pair.
+gpg --full-generate-key
+
+# Use the gpg --list-secret-keys --keyid-format=long
+# command to list the long form of the GPG keys for
+# which you have both a public and private key.
+gpg --list-secret-keys --keyid-format=long
+
+echo "make sure to execute the following:"
+echo "gpg --armor --export <GPG-key-ID>"
+echo "This will print the GPG key ID, in ASCII armor format"
+
+echo "To use, copy your GPG key, beginning with"
+echo "-----BEGIN PGP PUBLIC KEY BLOCK-----"
+echo "and ending with"
+echo "-----END PGP PUBLIC KEY BLOCK-----"
+
+echo "Also, if key is to be used for things like sigining git commits, make sure to add the following to either .bashrc or your login script:"
+echo 'export GPG_TTY=$(tty)'

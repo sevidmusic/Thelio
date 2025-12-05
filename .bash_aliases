@@ -20,8 +20,8 @@ alias musescore="~/Downloads/AppImages/MuseScore &"
 alias v='nvim'
 
 # git aliases
-alias gst="git_status"
-alias gbr="git_branch"
+alias gst="git status"
+alias gbr="git branch"
 # aliases to check on bare Thelio repo at ~/.Thelio
 alias thst="thelio_status"
 alias thbr="thelio_branch"
