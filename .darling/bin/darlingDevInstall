@@ -1,0 +1,109 @@
+#!/bin/sh
+#
+# This script will install Roady and create
+# and push a new development branch.
+#
+# Usage
+#
+# darlingDevInstall
+#
+
+msg() {
+  printf '%b%s%b' "\n\n\e[0m\e[105m\e[30m" "$1" "\e[0m\n\n"
+}
+
+importantMsg() {
+  printf '%b%s%b' "\n\n\e[0m\e[102m\e[30m" "$1" "\e[0m\n\n"
+}
+
+msgAndExit() {
+  importantMsg "$1"
+  exit 1
+}
+
+availableDarlingLibraries() {
+  darlingLibraries=""
+  darlingLibraries="${darlingLibraries} Roady"
+  darlingLibraries="${darlingLibraries} PHPTextTypes"
+  for darlingLibrary in ${darlingLibraries}; do
+    echo "${darlingLibrary}"
+  done
+}
+isADarlingLibrary() {
+  darlingLibraries=""
+  darlingLibraries="${darlingLibraries} Roady"
+  darlingLibraries="${darlingLibraries} PHPTextTypes"
+  for darlingLibrary in ${darlingLibraries}; do
+    [ "$1" = "${darlingLibrary}" ] && echo "true" && return 1
+  done
+  echo "false"
+}
+
+displayPleaseSpecifyLibraryNameMsgAndExit() {
+  importantMsg "Please specify the name of an availabile Darling library."
+  availableDarlingLibraries
+  importantMsg "For example:"
+  msgAndExit "darlingDevInstall Roady"
+}
+
+createPhpProjectsDirectoryIfNeccesary() {
+  [ ! -d "${1}" ] && mkdir -p "${1}"
+}
+
+exitIfLibraryIsAlreadyInstalled() {
+  [ -d "${1}" ] && msgAndExit "${2} is already installed."
+}
+
+if [ -z "${1}" ]; then
+  msgAndExit "Please specify the name of the Darling library to install for development."
+fi
+
+libraryName="${1}"
+
+msg "checking if library ${libraryName} is availabile..."
+
+installPossible="$(isADarlingLibrary "${libraryName}")"
+
+if [ "${installPossible}" = 'false' ]; then
+  displayPleaseSpecifyLibraryNameMsgAndExit
+fi
+
+msg "Preparing to install ${libraryName}..."
+
+timestamp=$(/usr/bin/date +"%s")
+pathToPhpProjects="${HOME}/Git"
+installationPath="$pathToPhpProjects/${libraryName}"
+# No longer works because git no longer allows creds to be passed via url:
+pass=$(/usr/bin/pass github.darling-dev.key)
+newBranchName="${libraryName}$timestamp"
+pathToPhpUnit="${installationPath}/vendor/bin/phpunit"
+pathToPhpStan="${installationPath}/vendor/bin/phpstan"
+pathToComposer="/home/sevidarling/.local/bin/composer"
+
+createPhpProjectsDirectoryIfNeccesary "${pathToPhpProjects}"
+
+exitIfLibraryIsAlreadyInstalled "${installationPath}" "${libraryName}"
+
+cd "${pathToPhpProjects}" || msgAndExit "Failed to move into ${pathToPhpProjects}"
+
+git clone "https://sevidmusic:$pass@github.com/sevidmusic/${libraryName}.git"
+
+cd "${installationPath}" || msgAndExit "Failed to move into ${installationPath}"
+
+"${pathToComposer}" update || msgAndExit 'Failed to run composer update'
+
+"${pathToPhpUnit}" -c "${installationPath}/php.xml"
+
+"${pathToPhpStan}" analyze --level 9 \
+  "${installationPath}/src" \
+  "${installationPath}/tests"
+
+git checkout -b "${newBranchName}"
+
+git push -u origin "$newBranchName"
+
+msg "Installed ${libraryName} at ${installationPath}"
+
+msg "Ran phpunit tests"
+
+msg "Ran phpstan tests"
