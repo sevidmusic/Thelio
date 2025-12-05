@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# runSystemUpdate()
+#
+# Run updates for cargo, and apt
+#
+runSystemUpdate() {
+    read -p "Do you really want to run system updates?" -n 1 -r
+    echo # display new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rustup update && sudo apt update && sudo apt upgrade
+    fi
+}
+
+runSystemUpdate
