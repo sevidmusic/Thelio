@@ -2,3 +2,8 @@
 
 # Update wal unless logging into new or existing tmux session
 [[ -z $TMUX ]] && updateWal
+
+# register GPG_TTY, used for gpg signing, for example for git commits.
+# @see https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key
+# @see https://superuser.com/questions/520980/how-to-force-gpg-to-use-console-mode-pinentry-to-prompt-for-passwords
+export GPG_TTY=$(tty)
