@@ -10,6 +10,8 @@ alias tls='tmux ls'
 alias tna='tmux a -t'
 alias tns='tmux new -s'
 alias vim='nvim'
+# Open all files listed in .vimfilelist in vim
+alias voa='xargs --delimiter "\\n" --arg-file="./.vimfilelist" nvim --'
 
 # App Image Shortcuts
 alias audacity="~/Downloads/AppImages/Audacity &"
@@ -21,6 +23,7 @@ alias v='nvim'
 
 # git aliases
 alias gst="git status"
+alias gdf="git diff"
 alias gbr="git branch"
 # aliases to check on bare Thelio repo at ~/.Thelio
 alias thst="thelio_status"

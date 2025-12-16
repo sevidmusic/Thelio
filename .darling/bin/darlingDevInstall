@@ -9,53 +9,52 @@
 #
 
 msg() {
-  printf '%b%s%b' "\n\n\e[0m\e[105m\e[30m" "$1" "\e[0m\n\n"
+    printf '%b%s%b' "\n\n\e[0m\e[105m\e[30m" "$1" "\e[0m\n\n"
 }
 
 importantMsg() {
-  printf '%b%s%b' "\n\n\e[0m\e[102m\e[30m" "$1" "\e[0m\n\n"
+    printf '%b%s%b' "\n\n\e[0m\e[102m\e[30m" "$1" "\e[0m\n\n"
 }
 
 msgAndExit() {
-  importantMsg "$1"
-  exit 1
+    importantMsg "$1"
+    exit 1
 }
 
 availableDarlingLibraries() {
-  darlingLibraries=""
-  darlingLibraries="${darlingLibraries} Roady"
-  darlingLibraries="${darlingLibraries} PHPTextTypes"
-  for darlingLibrary in ${darlingLibraries}; do
-    echo "${darlingLibrary}"
-  done
+    darlingLibraries=""
+    darlingLibraries="${darlingLibraries} Roady"
+    darlingLibraries="${darlingLibraries} PHPTextTypes"
+    darlingLibraries="${darlingLibraries} PHPDarlingDevTools"
+    for darlingLibrary in ${darlingLibraries}; do
+        echo "${darlingLibrary}"
+    done
 }
 isADarlingLibrary() {
-  darlingLibraries=""
-  darlingLibraries="${darlingLibraries} Roady"
-  darlingLibraries="${darlingLibraries} PHPTextTypes"
-  for darlingLibrary in ${darlingLibraries}; do
-    [ "$1" = "${darlingLibrary}" ] && echo "true" && return 1
-  done
-  echo "false"
+    darlingLibraries="$(availableDarlingLibraries)"
+    for darlingLibrary in ${darlingLibraries}; do
+        [ "$1" = "${darlingLibrary}" ] && echo "true" && return 1
+    done
+    echo "false"
 }
 
 displayPleaseSpecifyLibraryNameMsgAndExit() {
-  importantMsg "Please specify the name of an availabile Darling library."
-  availableDarlingLibraries
-  importantMsg "For example:"
-  msgAndExit "darlingDevInstall Roady"
+    importantMsg "Please specify the name of an availabile Darling library."
+    availableDarlingLibraries
+    importantMsg "For example:"
+    msgAndExit "darlingDevInstall Roady"
 }
 
 createPhpProjectsDirectoryIfNeccesary() {
-  [ ! -d "${1}" ] && mkdir -p "${1}"
+    [ ! -d "${1}" ] && mkdir -p "${1}"
 }
 
 exitIfLibraryIsAlreadyInstalled() {
-  [ -d "${1}" ] && msgAndExit "${2} is already installed."
+    [ -d "${1}" ] && msgAndExit "${2} is already installed."
 }
 
 if [ -z "${1}" ]; then
-  msgAndExit "Please specify the name of the Darling library to install for development."
+    msgAndExit "Please specify the name of the Darling library to install for development."
 fi
 
 libraryName="${1}"
@@ -65,7 +64,7 @@ msg "checking if library ${libraryName} is availabile..."
 installPossible="$(isADarlingLibrary "${libraryName}")"
 
 if [ "${installPossible}" = 'false' ]; then
-  displayPleaseSpecifyLibraryNameMsgAndExit
+    displayPleaseSpecifyLibraryNameMsgAndExit
 fi
 
 msg "Preparing to install ${libraryName}..."
@@ -95,8 +94,8 @@ cd "${installationPath}" || msgAndExit "Failed to move into ${installationPath}"
 "${pathToPhpUnit}" -c "${installationPath}/php.xml"
 
 "${pathToPhpStan}" analyze --level 9 \
-  "${installationPath}/src" \
-  "${installationPath}/tests"
+    "${installationPath}/src" \
+    "${installationPath}/tests"
 
 git checkout -b "${newBranchName}"
 
