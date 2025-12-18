@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Setup terminal
+tput civis
+tput clear
+trap "tput cnorm; tput sgr0; clear; exit" SIGINT SIGTERM
+
+cols=$(tput cols)
+lines=$(tput lines)
+
+# Colors array
+colors=("\e[31m" "\e[32m" "\e[33m" "\e[34m" "\e[35m" "\e[36m" "\e[37m")
+
+# Initialize columns: -1 means "inactive"
+for ((i = 0; i < cols; i++)); do
+    pos[$i]=-1
+done
+
+while true; do
+    # 1. Randomly activate new drops
+    for ((i = 0; i < cols; i++)); do
+        # If column is inactive, 5% chance to start a new drop
+        if [[ ${pos[$i]} -eq -1 ]]; then
+            if ((RANDOM % 100 < 5)); then
+                pos[$i]=0
+                # Assign a fixed color for the duration of this drop
+                col_color[$i]=${colors[$((RANDOM % ${#colors[@]}))]}
+            fi
+        fi
+    done
+
+    # 2. Draw and update all active drops
+    for ((i = 0; i < cols; i++)); do
+        if [[ ${pos[$i]} -ge 0 ]]; then
+            # Clear a trailing space a few rows behind the head
+            # This creates the "length" of the trail
+            trail_end=$((pos[$i] - 10))
+            if [[ $trail_end -ge 0 ]]; then
+                tput cup $trail_end $i
+                echo -n " "
+            fi
+
+            # Draw the leading character
+            if [[ ${pos[$i]} -lt $lines ]]; then
+                tput cup ${pos[$i]} $i
+                char=$(printf "\\$(printf '%03o' $((RANDOM % 94 + 33)))")
+                echo -e "${col_color[$i]}$char\e[0m"
+            fi
+
+            # Increment position
+            ((pos[$i]++))
+
+            # Reset if the trail has completely passed the bottom
+            if [[ $((pos[$i] - 10)) -ge $lines ]]; then
+                pos[$i]=-1
+            fi
+        fi
+    done
+
+    # Small delay to regulate speed
+    # Reducing this makes it faster; increasing it makes it "steppy"
+    sleep 0.02
+done

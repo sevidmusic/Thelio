@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Setup terminal
+tput civis
+tput clear
+# Reset terminal on exit
+trap "tput cnorm; tput sgr0; clear; exit" SIGINT SIGTERM
+
+cols=$(tput cols)
+lines=$(tput lines)
+
+# Colors: Green, Cyan, Blue, Magenta
+colors=("\e[32m" "\e[36m" "\e[34m" "\e[35m")
+white="\e[1;37m" # Bold White for the "glow"
+
+# Initialize arrays
+for ((i = 0; i < cols; i++)); do
+    pos[$i]=-1
+    speed[$i]=1
+    col_color[$i]=""
+done
+
+count=0
+while true; do
+    ((count++))
+
+    # 1. Randomly activate new drops
+    for ((i = 0; i < cols; i++)); do
+        if [[ ${pos[$i]} -eq -1 ]]; then
+            if ((RANDOM % 100 < 3)); then
+                pos[$i]=0
+                # Assign a random speed (1 = fast, 3 = slow)
+                speed[$i]=$(((RANDOM % 3) + 1))
+                # Assign a fixed color for this drop
+                col_color[$i]=${colors[$((RANDOM % ${#colors[@]}))]}
+            fi
+        fi
+    done
+
+    # 2. Draw and update
+    for ((i = 0; i < cols; i++)); do
+        # Only move the drop if the current loop count is a multiple of its speed
+        if [[ ${pos[$i]} -ge 0 ]] && ((count % speed[$i] == 0)); then
+
+            # CLEAR TRAIL: Remove the character 12 rows behind
+            trail_end=$((pos[$i] - 12))
+            if [[ $trail_end -ge 0 ]]; then
+                tput cup $trail_end $i
+                echo -n " "
+            fi
+
+            # COLORIZE PREVIOUS HEAD: Turn the old white head into its assigned color
+            old_head=$((pos[$i] - 1))
+            if [[ $old_head -ge 0 && $old_head -lt $lines ]]; then
+                tput cup $old_head $i
+                # Generate a new random char for the "body" of the rain
+                char=$(printf "\\$(printf '%03o' $((RANDOM % 94 + 33)))")
+                echo -e "${col_color[$i]}$char\e[0m"
+            fi
+
+            # DRAW NEW GLOW HEAD: White character at the current position
+            if [[ ${pos[$i]} -lt $lines ]]; then
+                tput cup ${pos[$i]} $i
+                char=$(printf "\\$(printf '%03o' $((RANDOM % 94 + 33)))")
+                echo -e "${white}${char}\e[0m"
+            fi
+
+            ((pos[$i]++))
+
+            # Reset column when trail clears the screen
+            if [[ $((pos[$i] - 12)) -ge $lines ]]; then
+                pos[$i]=-1
+            fi
+        fi
+    done
+
+    # Very small sleep for global timing
+    sleep 0.01
+done
