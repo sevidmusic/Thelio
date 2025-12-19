@@ -10,6 +10,7 @@ alias tls='tmux ls'
 alias tna='tmux a -t'
 alias tns='tmux new -s'
 alias vim='nvim'
+alias diff='diff --ignore-all-space --unified --color=always'
 # Open all files listed in .vimfilelist in vim
 alias voa='xargs --delimiter "\\n" --arg-file="./.vimfilelist" nvim --'
 

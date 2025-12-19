@@ -75,5 +75,5 @@ while true; do
     done
 
     # Very small sleep for global timing
-    sleep 0.01
+    sleep 0.001
 done
