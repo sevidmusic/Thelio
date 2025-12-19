@@ -2,12 +2,12 @@ use crossterm::{
     cursor,
     event::{self, Event, KeyCode},
     execute,
-    style::{self, Color, Print, SetForegroundColor},
+    style::{Color, Print, SetForegroundColor},
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use rand::Rng;
 use std::io::{self, stdout, Write};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// Represents a single vertical stream of characters in the matrix rain.
 /// Each column manages its own position, speed, and character set.

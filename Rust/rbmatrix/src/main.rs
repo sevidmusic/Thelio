@@ -7,7 +7,7 @@ use crossterm::{
 };
 use rand::Rng;
 use std::io::{self, stdout, Write};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 #[derive(Clone, Copy)]
 enum Reality {
