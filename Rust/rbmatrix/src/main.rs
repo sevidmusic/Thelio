@@ -3,7 +3,7 @@ use crossterm::{
     event::{self, Event, KeyCode},
     execute,
     style::{Color, Print, SetForegroundColor},
-    terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
+    terminal::{self, EnterAlternateScreen, LeaveAlternateScreen, Clear, ClearType},
 };
 use rand::Rng;
 use std::io::{self, stdout, Write};
@@ -22,7 +22,6 @@ struct Column {
     speed_threshold: u16,
     chars: Vec<char>,
     len: usize,
-    base_hue: u8,
 }
 
 impl Column {
@@ -36,7 +35,6 @@ impl Column {
             speed_threshold: rng.gen_range(2..5),
             len,
             chars: (0..len).map(|_| Self::random_char()).collect(),
-            base_hue: rng.gen_range(0..100), // Used to vary the shade
         }
     }
 
@@ -51,16 +49,8 @@ impl Column {
         let intensity = (255 - (index * 255 / self.len)) as u8;
 
         match reality {
-            Reality::MatrixGreen => Color::Rgb {
-                r: (intensity / 5),
-                g: intensity,
-                b: (intensity / 5)
-            },
-            Reality::DeepBlue => Color::Rgb {
-                r: (intensity / 10),
-                g: (intensity / 2),
-                b: intensity
-            },
+            Reality::MatrixGreen => Color::Rgb { r: 0, g: intensity, b: 0 },
+            Reality::DeepBlue => Color::Rgb { r: 0, g: intensity / 3, b: intensity },
         }
     }
 
@@ -86,24 +76,37 @@ impl Column {
 fn main() -> io::Result<()> {
     let mut stdout = stdout();
     terminal::enable_raw_mode()?;
-    execute!(stdout, EnterAlternateScreen, cursor::Hide, terminal::Clear(terminal::ClearType::All))?;
+    execute!(stdout, EnterAlternateScreen, cursor::Hide, Clear(ClearType::All))?;
 
-    let (width, height) = terminal::size()?;
+    let (mut width, mut height) = terminal::size()?;
     let mut columns: Vec<Column> = (0..width).step_by(3).map(|x| Column::new(x, height)).collect();
     let mut current_reality = Reality::MatrixGreen;
     let mut tick_rate = Duration::from_millis(16);
 
     loop {
-        if event::poll(Duration::from_millis(0))? {
-            if let Event::Key(key) = event::read()? {
-                match key.code {
-                    KeyCode::Char('q') | KeyCode::Esc => break,
+        // Handle all pending events
+        while event::poll(Duration::from_millis(0))? {
+            match event::read()? {
+                Event::Key(key) => match key.code {
+                    KeyCode::Char('q') | KeyCode::Esc => {
+                        execute!(stdout, cursor::Show, LeaveAlternateScreen)?;
+                        terminal::disable_raw_mode()?;
+                        return Ok(());
+                    }
                     KeyCode::Char('r') => current_reality = Reality::MatrixGreen,
                     KeyCode::Char('b') => current_reality = Reality::DeepBlue,
                     KeyCode::Up | KeyCode::Char('k') => tick_rate = tick_rate.saturating_sub(Duration::from_millis(2)),
                     KeyCode::Down | KeyCode::Char('j') => tick_rate += Duration::from_millis(2),
                     _ => {}
+                },
+                // RE-INITIALIZE ON RESIZE
+                Event::Resize(nw, nh) => {
+                    width = nw;
+                    height = nh;
+                    columns = (0..width).step_by(3).map(|x| Column::new(x, height)).collect();
+                    execute!(stdout, Clear(ClearType::All))?;
                 }
+                _ => {}
             }
         }
 
@@ -129,8 +132,4 @@ fn main() -> io::Result<()> {
         stdout.flush()?;
         std::thread::sleep(tick_rate);
     }
-
-    execute!(stdout, cursor::Show, LeaveAlternateScreen)?;
-    terminal::disable_raw_mode()?;
-    Ok(())
 }
