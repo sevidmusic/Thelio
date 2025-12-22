@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# This script will run `phpstan` tests for the specified library
+# via `entr` whenever a file in one of the following directories
+# is modified:
+#
+# ${PATH_TO_LIBRARY}/tests
+# ${PATH_TO_LIBRARY}/src
+# ${PATH_TO_LIBRARY}/modules
+#
+# Also, this script will run `phpstan` tests for the specified
+# library if any of the following files are modified:
+#
+# ${PATH_TO_LIBRARY}/index.php
+#
+# Usage:
+#
+# runPhpStanTestsOnSave $PATH_TO_LIBRARY
+#
+
+msg() {
+    printf '%b%s%b' "\n\n\e[0m\e[105m\e[30m" "$1" "\e[0m\n\n"
+}
+
+msgAndExit() {
+    msg "$1"
+    exit 1
+}
+
+clear
+
+[ -z "${1}" ] && msgAndExit "Please specify the path to the library: runPhpStanTestsOnSave $PATH_TO_LIBRARY"
+
+pathToLibrary="${1}"
+
+pathToPhpStan="$pathToLibrary/vendor/bin/phpstan"
+
+cd "$pathToLibrary" || msgAndExit 'roady is not installed'
+
+find \
+    "$pathToLibrary/tests" \
+    "$pathToLibrary/src" \
+    "$pathToLibrary/modules" \
+    "$pathToLibrary/index.php" \
+    -type f -name "*.php" |
+    entr -c "$pathToPhpStan"
