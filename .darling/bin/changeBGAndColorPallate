@@ -19,5 +19,6 @@ noBackendSpecifiedMsg="Please specify a color backend: colorz, colorthief, or wa
 [ -z "$colorBackend" ] && echo -e "\033[1;93m ${noBackendSpecifiedMsg} \033[0m" && exit 1
 
 wal -c
-wal -q --backend "$colorBackend" -i "$pathToPicture"
-gsettings set org.gnome.desktop.background picture-uri-dark "$pathToPicture"
+wal -q --backend "${colorBackend}" -i "${pathToPicture}"
+gsettings set org.gnome.desktop.background picture-uri-dark "${pathToPicture}"
+echo "${colorBackend}" >"${HOME}/.lastColorBackend.txt"

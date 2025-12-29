@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Filter for display.
+#
+# Usage:
+#
+# pip3 list --outdated | filterForDisplay
+#
+filterForDisplay() {
+    lineNumber=0
+    # read from stdin line by line
+    while IFS= read -r line; do
+        if [[ $lineNumber -gt 1 ]]; then
+            # "$line" represents the current line from the pipe
+            echo -e "${line}" |
+                awk '{ print "\033[0m\033[43m"$1" ""\033[0m\033[42m"$2"\033[0m\033[43m --> \033[0m\033[44m"$3 "\033[0m\033[43m | To upgrade run:\033[0m pip3 install --upgrade " $1}' |
+                sed '/^$/d'
+        fi
+        lineNumber=$((lineNumber + 1))
+    done
+}
+# List python packages installed by that need to be updated
+echo -e "\033[0m\033[43m"
+echo "The following python packages can be upgraded via:"
+echo -e "\033[0m"
+echo
+echo "  pip3 install --upgrade PACKAGE"
+echo -e "\033[0m\033[42m"
+echo "Note: It is best to install/upgrade python packages one at a "
+echo "time in case of errors."
+echo -e "\033[0m\033[43m"
+pip3 list --outdated | filterForDisplay
+echo -e "\033[0m"

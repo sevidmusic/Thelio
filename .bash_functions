@@ -160,3 +160,19 @@ convert_md_to_html() {
         echo -e "\033[1;32m Converted ${1} to ${2} \033[0m"
     fi
 }
+
+# Helpers
+
+# Remove empty lines from input.
+#
+# Usage:
+#
+# echo -e "\n\nsome input \n\n with empty lines" | removeEmptyLines
+#
+removeEmptyLines() {
+    # read from stdin line by line
+    while IFS= read -r line; do
+        # "$line" represents the current line from the pipe
+        echo "${line}" | sed '/^$/d'
+    done
+}
