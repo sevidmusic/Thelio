@@ -1,0 +1,9 @@
+#!/bin/bash
+
+colorBackends=("wal" "colorz" "colorthief")
+
+colorBackend=${colorBackends[$RANDOM % ${#colorBackends[@]}]}
+
+randomImage=$(find ~/Pictures/ -type f | sort -R | tail -1)
+
+changeBGAndColorPallate "${randomImage}" "${colorBackend}"

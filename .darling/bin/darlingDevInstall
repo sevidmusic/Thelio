@@ -23,9 +23,23 @@ msgAndExit() {
 
 availableDarlingLibraries() {
     darlingLibraries=""
-    darlingLibraries="${darlingLibraries} Roady"
-    darlingLibraries="${darlingLibraries} PHPTextTypes"
+    darlingLibraries="${darlingLibraries} PHPCliUtilities"
     darlingLibraries="${darlingLibraries} PHPDarlingDevTools"
+    darlingLibraries="${darlingLibraries} PHPFileSystemPaths"
+    darlingLibraries="${darlingLibraries} PHPJsonStorageUtilities"
+    darlingLibraries="${darlingLibraries} PHPJsonUtilities"
+    darlingLibraries="${darlingLibraries} PHPMockingUtilities"
+    darlingLibraries="${darlingLibraries} PHPReflectionUtilities"
+    darlingLibraries="${darlingLibraries} PHPTextTypes"
+    darlingLibraries="${darlingLibraries} PHPUnitTestUtilities"
+    darlingLibraries="${darlingLibraries} PHPWebPaths"
+    darlingLibraries="${darlingLibraries} Rig"
+    darlingLibraries="${darlingLibraries} Roady"
+    darlingLibraries="${darlingLibraries} RoadyModuleUtilities"
+    darlingLibraries="${darlingLibraries} RoadyModules"
+    darlingLibraries="${darlingLibraries} RoadyRoutes"
+    darlingLibraries="${darlingLibraries} RoadyRoutingUtilities"
+    darlingLibraries="${darlingLibraries} RoadyUIUtilities"
     for darlingLibrary in ${darlingLibraries}; do
         echo "${darlingLibrary}"
     done
