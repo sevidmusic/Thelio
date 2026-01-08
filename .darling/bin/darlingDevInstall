@@ -40,6 +40,7 @@ availableDarlingLibraries() {
     darlingLibraries="${darlingLibraries} RoadyRoutes"
     darlingLibraries="${darlingLibraries} RoadyRoutingUtilities"
     darlingLibraries="${darlingLibraries} RoadyUIUtilities"
+    darlingLibraries="${darlingLibraries} PHPCliFormattingUtilities"
     for darlingLibrary in ${darlingLibraries}; do
         echo "${darlingLibrary}"
     done
