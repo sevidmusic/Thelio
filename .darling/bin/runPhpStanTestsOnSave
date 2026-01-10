@@ -29,18 +29,34 @@ msgAndExit() {
 
 clear
 
-[ -z "${1}" ] && msgAndExit "Please specify the path to the library: runPhpStanTestsOnSave $PATH_TO_LIBRARY"
+[ -z "${1}" ] && msgAndExit 'Please specify the path to the library: runPhpStanTestsOnSave PATH_TO_LIBRARY'
 
 pathToLibrary="${1}"
 
 pathToPhpStan="$pathToLibrary/vendor/bin/phpstan"
 
-cd "$pathToLibrary" || msgAndExit 'roady is not installed'
+cd "$pathToLibrary" || msgAndExit "Library not found at: ${pathToLibrary}"
 
-find \
-    "$pathToLibrary/tests" \
-    "$pathToLibrary/src" \
-    "$pathToLibrary/modules" \
-    "$pathToLibrary/index.php" \
-    -type f -name "*.php" |
-    entr -c "$pathToPhpStan"
+[ -d "$pathToLibrary/.git" ] || msgAndExit "$(pwd) is not a darling library"
+
+# Test Roady
+if [ -d "$pathToLibrary/modules" ]; then
+    msg "Testing Roady"
+    find \
+        "${pathToLibrary}/tests" \
+        "${pathToLibrary}/src" \
+        "${pathToLibrary}/modules" \
+        "${pathToLibrary}/index.php" \
+        -type f -name "*.php" |
+        entr -c "${pathToPhpStan}"
+fi
+
+# Test Other
+if [ ! -f "$pathToLibrary/index.php" ]; then
+    msg "Testing ${pathToLibrary}"
+    find \
+        "${pathToLibrary}/tests" \
+        "${pathToLibrary}/src" \
+        -type f -name "*.php" |
+        entr -c "${pathToPhpStan}"
+fi
